@@ -6,16 +6,11 @@ const bodyParser = require('body-parser')
 const userRouter = require('./routers/usersRouter')
 const {logRequest} = require('./generalHelpers')
 const { v4: uuidv4 } = require("uuid");
+const {validateUser} = require('./userHelpers')
 
 app.use(bodyParser.json())
 /*
-https://www.youtube.com/playlist?list=PLdRrBA8IaU3Xp_qy8X-1u-iqeLlDCmR8a
-Fork the project 
-git clone {url}
-npm i
-
-
-Create server with the following end points 
+Create server with the following end points :
 POST /users with uuid, unique username 
 PATCH /users/id 
 GET /users with age filter 
@@ -30,10 +25,6 @@ Bonus
 Edit patch end point to handle the sent data only
 If age is not sent return all users
 
-
-git add .
-git commit -m "message"
-git push
 */
 
 app.post("/users", validateUser, async (req, res, next) => {
@@ -54,7 +45,6 @@ app.post("/users", validateUser, async (req, res, next) => {
 });
 
 app.patch("/users/:userId", validateUser, async (req, res, next) => {
-
 });
 
 
@@ -72,9 +62,14 @@ app.get('/users', async (req,res,next)=>{
 
 })
 
-app.use(logRequest)
-
 app.use((err,req,res,next)=>{
+  if(err.status >= 500)
+  {
+    res.send("Error in system")
+  }else
+  {
+    res.send(err.message)
+  }
 
 })
 
