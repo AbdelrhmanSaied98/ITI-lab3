@@ -10,7 +10,6 @@ const {validateUser} = require('./userHelpers')
 
 app.use(bodyParser.json())
 /*
-POST /users/login /sucess 200 , error:403
 GET /users/id   200,   eror:404
 DELETE users/id  200,    error:404
 complete middleware for validating user
@@ -84,6 +83,19 @@ app.get('/users', async (req,res,next)=>{
 
 })
 
+
+app.get('/users/:userId', async (req,res,next)=>{
+  try {
+  const users = await fs.promises
+  .readFile("./user.json", { encoding: "utf8" })
+  .then((data) => JSON.parse(data));
+  const filteredUsers = users.filter(user=>user.id===req.params.userId)
+  res.status(200).send(filteredUsers)
+  } catch (error) {
+  next({ status: 404, internalMessage: error.message });
+  }
+
+})
 app.use((err,req,res,next)=>{
   if(err.status >= 500)
   {
