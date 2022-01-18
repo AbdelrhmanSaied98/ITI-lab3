@@ -36,8 +36,23 @@ app.post("/users", validateUser, async (req, res, next) => {
   }
 });
 
-app.post("/users/login", validateUser,(req, res, next) => {
-  res.status(200).send({message: "sucess"});
+app.post("/users/login", validateUser,async (req, res, next) => {
+  const { username, password } = req.body;
+  try {
+    const users = await fs.promises
+    .readFile("./user.json", { encoding: "utf8" })
+    .then((data) => JSON.parse(data));
+    const isUser = users.some(user=>user.username===username && user.password ===password)
+    if(isUser)
+    {
+      res.status(200).send({message: "you are with us"});
+    }else
+    {
+      next({status:422, message:"you are not with us"})
+    }
+    } catch (error) {
+    next({ status: 500, internalMessage: error.message });
+    }
 });
 app.patch("/users/:userId", validateUser, async (req, res, next) => {
   const { username, age, password } = req.body;

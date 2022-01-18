@@ -10,14 +10,7 @@ const validateUser = async (req, res, next) =>{
         const users = JSON.parse(data)
         const isUsernameExists = users.some(user=>user.username===username)
         const [,,rootName] = req.url.split('/');
-        if(isUsernameExists && req.method == "POST" && !rootName) return next({status:422, message:"username is used"})
-        if(isUsernameExists)
-        {
-            return next()
-        }else
-        {
-            return next({status:403, message:"Not in our users"})
-        }
+        if(isUsernameExists && req.method == "POST" && typeof rootName == "undefined") return next({status:422, message:"username is used"})
         next()
     } catch (error) {
         next({status:500, internalMessage:error.message})
