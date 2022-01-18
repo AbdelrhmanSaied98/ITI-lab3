@@ -115,17 +115,16 @@ app.delete('/users/:userId', async (req,res,next)=>{
   const users = await fs.promises
   .readFile("./user.json", { encoding: "utf8" })
   .then((data) => JSON.parse(data));
-  const filteredUsers = users.map(user=>{
+  const filteredUsers = users.filter(user=>{
     if(user.id != req.params.userId)
     {
       return user
     }
   })
-  console.log(filteredUsers);
-  // await fs.promises.writeFile("./user.json", JSON.stringify(filteredUsers), {
-  //   encoding: "utf8",
-  // });
-  // res.status(200).send("Done delete")
+  await fs.promises.writeFile("./user.json", JSON.stringify(filteredUsers), {
+    encoding: "utf8",
+  });
+  res.status(200).send("Done delete")
   } catch (error) {
   next({ status: 404, internalMessage: error.message });
   }
