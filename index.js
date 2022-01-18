@@ -10,8 +10,6 @@ const {validateUser} = require('./userHelpers')
 
 app.use(bodyParser.json())
 /*
-GET /users with age filter 
-Create Error handler 
 POST /users/login /sucess 200 , error:403
 GET /users/id   200,   eror:404
 DELETE users/id  200,    error:404
@@ -41,6 +39,9 @@ app.post("/users", validateUser, async (req, res, next) => {
   }
 });
 
+app.post("/users/login", validateUser,(req, res, next) => {
+  res.status(200).send({message: "sucess"});
+});
 app.patch("/users/:userId", validateUser, async (req, res, next) => {
   const { username, age, password } = req.body;
   try
