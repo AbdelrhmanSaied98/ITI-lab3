@@ -10,9 +10,6 @@ const {validateUser} = require('./userHelpers')
 
 app.use(bodyParser.json())
 /*
-Create server with the following end points :
-POST /users with uuid, unique username 
-PATCH /users/id 
 GET /users with age filter 
 Create Error handler 
 POST /users/login /sucess 200 , error:403
@@ -60,7 +57,6 @@ app.patch("/users/:userId", validateUser, async (req, res, next) => {
         return {username, age,password,"id":user.id}
       }
     });
-    console.log(newDate);
     await fs.promises.writeFile("./user.json", JSON.stringify(newDate), {
         encoding: "utf8",
     });
