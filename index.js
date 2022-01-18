@@ -10,9 +10,7 @@ const {validateUser} = require('./userHelpers')
 
 app.use(bodyParser.json())
 /*
-GET /users/id   200,   eror:404
 DELETE users/id  200,    error:404
-complete middleware for validating user
 Create Route For users 
 
 Bonus
@@ -96,6 +94,31 @@ app.get('/users/:userId', async (req,res,next)=>{
   }
 
 })
+
+app.delete('/users/:userId', async (req,res,next)=>{
+  try {
+  const users = await fs.promises
+  .readFile("./user.json", { encoding: "utf8" })
+  .then((data) => JSON.parse(data));
+  const filteredUsers = users.map(user=>{
+    if(user.id != req.params.userId)
+    {
+      return user
+    }
+  })
+  console.log(filteredUsers);
+  // await fs.promises.writeFile("./user.json", JSON.stringify(filteredUsers), {
+  //   encoding: "utf8",
+  // });
+  // res.status(200).send("Done delete")
+  } catch (error) {
+  next({ status: 404, internalMessage: error.message });
+  }
+
+})
+
+
+
 app.use((err,req,res,next)=>{
   if(err.status >= 500)
   {
