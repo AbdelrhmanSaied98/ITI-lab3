@@ -45,6 +45,31 @@ app.post("/users", validateUser, async (req, res, next) => {
 });
 
 app.patch("/users/:userId", validateUser, async (req, res, next) => {
+  const { username, age, password } = req.body;
+  try
+  {
+    const data = await fs.promises
+        .readFile("./user.json", { encoding: "utf8" })
+        .then((data) => JSON.parse(data));
+    let newDate = data.map((user)=>{
+      if(user.id != req.params.userId)
+      {
+        return user
+      }else
+      {
+        return {username, age,password,"id":user.id}
+      }
+    });
+    console.log(newDate);
+    await fs.promises.writeFile("./user.json", JSON.stringify(newDate), {
+        encoding: "utf8",
+    });
+    res.send({message: "sucess" });
+
+  }catch(error)
+  {
+    next({ status: 500, internalMessage: error.message });
+  }
 });
 
 
