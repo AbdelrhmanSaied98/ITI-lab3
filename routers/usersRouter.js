@@ -28,70 +28,21 @@ router.post("/", async (req, res, next) => {
       if(!user) return next({status:401, message:"username or passord is incorrect"})
       if(user.password !== password) next({status:401, message:"username or passord is incorrect"})
       const payload = {id:user.id }
+
       const token = jwt.sign(payload,serverConfig.secret,{expiresIn :"1h"})
       return res.status(200).send({message:"Logged in Successfully",token}) 
   });
   
   //Update user data
-  router.patch("/:userId", async (req, res, next) => {
-    const { username, age, password } = req.body;
+  router.patch("/:userId",auth,async (req, res, next) => {
+    if(req.user.id!==req.params.userId) next({status:403, message:"Authorization error"})
     try
     {
-      const data = await fs.promises
-          .readFile("./user.json", { encoding: "utf8" })
-          .then((data) => JSON.parse(data));
-      let isUser = false
-      let newDate = data.map((user)=>{
-        if(user.id != req.params.userId)
-        {
-            return user
-        }else
-        {
-            isUser = true;
-            let newObject = 
-            {
-                id:user.id,
-                username:"",
-                age:0,
-                password:""
-            };
-            if(typeof username == 'undefined')
-            {
-                newObject.username = user.username
-            }else
-            {
-                newObject.username = username
-            }
-
-            if(typeof age == 'undefined')
-            {
-                newObject.age = user.age
-            }else
-            {
-                newObject.age = age
-            }
-
-            if(typeof password == 'undefined')
-            {
-                newObject.password = user.password
-            }else
-            {
-                newObject.password = password
-            }
-            return newObject
-        }
-      });
-      if(isUser)
-      {
-        await fs.promises.writeFile("./user.json", JSON.stringify(newDate), {
-          encoding: "utf8",
-        });
-        res.send({message: "sucess" });
-      }else
-      {
-        next({ status: 403, message: "ID isnt valid" });
-      }
-  
+      const {password, age} = req.body
+      req.user.password = password || req.user.password
+      req.user.age = age || req.user.age
+      await req.user.save()
+      res.send("sucess")
     }catch(error)
     {
       next({ status: 500, internalMessage: error.message });
