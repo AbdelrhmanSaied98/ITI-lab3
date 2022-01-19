@@ -9,14 +9,7 @@ app.use('/users',userRouter)
 
 //Error handeler
 app.use((err,req,res,next)=>{
-  if(err.status >= 500)
-  {
-    res.status(err.status).send("Error in the system")
-  }else
-  {
     res.status(err.status).send(err.message)
-  }
-
 })
 
 

@@ -2,49 +2,38 @@ require('dotenv').config()
 const { validateUser } = require("../userHelpers");
 const express = require("express");
 var jwt = require('jsonwebtoken');
-const serverConfig = require('./serverConfig')
-const { auth } = require('./middlewares/auth')
-const User = require('./models/User')
-require('./mongoConnect')
+const serverConfig = require('../serverConfig')
+const { auth } = require('../middlewares/auth')
+const User = require('../models/User')
+require('../mongoConnect')
 const router = express.Router();
 
 
 //Create new User
-router.post("/", validateUser, async (req, res, next) => {
+router.post("/", async (req, res, next) => {
     try {
         const { username, age, password } = req.body;
         const user = new User({username, age, password})
-      await user.save()
-        res.send({ id, message: "sucess" });
+        await user.save()
+        res.send({message: "sucess" });
     } catch (error) {
-        next({ status: 500, internalMessage: error.message });
+        next({ status: 500, message: error.message });
     }
   });
   
   //Log in user
   router.post("/login",async (req, res, next) => {
-    const { username, password } = req.body;
-    if(!username) return next({status:422, message:"username is requird"})
-    if(!password) return next({status:422, message:"password is requird"})
-    try {
-      const users = await fs.promises
-      .readFile("./user.json", { encoding: "utf8" })
-      .then((data) => JSON.parse(data));
-      const isUser = users.some(user=>user.username===username && user.password ===password)
-      if(isUser)
-      {
-        res.status(200).send({message: "you are with us"});
-      }else
-      {
-        next({status:403, message:"you are not with us"})
-      }
-      } catch (error) {
-      next({ status: 500, internalMessage: error.message });
-      }
+    const {username, password} = req.body
+      const user = await User.findOne({ username })
+      if(!user) return next({status:401, message:"username or passord is incorrect"})
+      if(user.password !== password) next({status:401, message:"username or passord is incorrect"})
+      const payload = {id:user.id }
+      const token = jwt.sign(payload,serverConfig.secret,{expiresIn :"1h"})
+      return res.status(200).send({message:"Logged in Successfully",token}) 
   });
   
   //Update user data
-  router.patch("/:userId", validateUser, async (req, res, next) => {
+  router.patch("/:userId", async (req, res, next) => {
     const { username, age, password } = req.body;
     try
     {
