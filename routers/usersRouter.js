@@ -114,12 +114,22 @@ router.post("/", validateUser, async (req, res, next) => {
   //get all user depending on age
   router.get('/', async (req,res,next)=>{
     try {
-    const age = Number(req.query.age)
-    const users = await fs.promises
-    .readFile("./user.json", { encoding: "utf8" })
-    .then((data) => JSON.parse(data));
-    const filteredUsers = users.filter(user=>user.age===age)
-    res.send(filteredUsers)
+    if(typeof req.query.age == 'undefined')
+    {
+      const users = await fs.promises
+      .readFile("./user.json", { encoding: "utf8" })
+      .then((data) => JSON.parse(data));
+      res.send(users)
+    }else
+    {
+      const age = Number(req.query.age)
+      const users = await fs.promises
+      .readFile("./user.json", { encoding: "utf8" })
+      .then((data) => JSON.parse(data));
+      const filteredUsers = users.filter(user=>user.age===age)
+      res.send(filteredUsers)
+    }
+    
     } catch (error) {
     next({ status: 500, internalMessage: error.message });
     }
