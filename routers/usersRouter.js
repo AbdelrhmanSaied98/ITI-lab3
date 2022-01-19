@@ -1,22 +1,20 @@
-const fs = require("fs");
+require('dotenv').config()
 const { validateUser } = require("../userHelpers");
 const express = require("express");
+var jwt = require('jsonwebtoken');
+const serverConfig = require('./serverConfig')
+const { auth } = require('./middlewares/auth')
+const User = require('./models/User')
+require('./mongoConnect')
 const router = express.Router();
-const { v4: uuidv4 } = require("uuid");
 
 
 //Create new User
 router.post("/", validateUser, async (req, res, next) => {
     try {
         const { username, age, password } = req.body;
-        const data = await fs.promises
-            .readFile("./user.json", { encoding: "utf8" })
-            .then((data) => JSON.parse(data));
-        const id = uuidv4();
-        data.push({ id, username, age, password });
-        await fs.promises.writeFile("./user.json", JSON.stringify(data), {
-            encoding: "utf8",
-        });
+        const user = new User({username, age, password})
+      await user.save()
         res.send({ id, message: "sucess" });
     } catch (error) {
         next({ status: 500, internalMessage: error.message });
