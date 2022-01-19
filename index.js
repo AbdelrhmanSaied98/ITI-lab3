@@ -8,8 +8,6 @@ const userRouter = require('./routers/usersRouter')
 app.use(bodyParser.json())
 app.use('/users',userRouter)
 /*
-Create Route For users 
-
 Bonus
 Edit patch end point to handle the sent data only
 If age is not sent return all users

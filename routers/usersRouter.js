@@ -57,11 +57,41 @@ router.post("/", validateUser, async (req, res, next) => {
       let newDate = data.map((user)=>{
         if(user.id != req.params.userId)
         {
-          return user
+            return user
         }else
         {
-          isUser = true;
-          return {username, age,password,"id":user.id}
+            isUser = true;
+            let newObject = 
+            {
+                id:user.id,
+                username:"",
+                age:0,
+                password:""
+            };
+            if(typeof username == 'undefined')
+            {
+                newObject.username = user.username
+            }else
+            {
+                newObject.username = username
+            }
+
+            if(typeof age == 'undefined')
+            {
+                newObject.age = user.age
+            }else
+            {
+                newObject.age = age
+            }
+
+            if(typeof password == 'undefined')
+            {
+                newObject.password = user.password
+            }else
+            {
+                newObject.password = password
+            }
+            return newObject
         }
       });
       if(isUser)
